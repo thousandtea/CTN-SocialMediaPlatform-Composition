@@ -24,15 +24,9 @@ class Query(graphene.ObjectType):
         return 'Hello, world!'
 
     def resolve_user(self, info):
-        return User(id="1", name="Chang Liu", email="cl4404@columbia.edu")
+        return User()
 
 
-# mock
-notifications = [
-    {"id": 1, "message": "User 1 has a new post on label fun"},
-    {"id": 2, "message": "User 3 comment on the post 3"},
-    {"id": 3, "message": "User 4 delete the post 2"}
-]
 
 schema = graphene.Schema(query=Query)
 app = Flask(__name__)
@@ -58,15 +52,15 @@ def log_response(service_name, response):
 def sync_call():
     # sync_call
     user_response = requests.get(f"{USERS_SERVICE_URL}/api/users")
-    user = {'message': "User1 : cl4404"}
-    log_response("Users Service", user)
+    user = user_response.json()
+    log_response("Users Service", user_response)
 
     content_response = requests.get(f"{CONTENT_SERVICE_URL}/api/content")
-    content = {"message": "aasl21049i323 : This is a test post"}
+    content = content_response.json()
     log_response("Content Service", content)
 
     notification_response = requests.get(f"{NOTIFICATION_SERVICE_URL}/api/notification")
-    notification = {'message': "notice2134 : Hello from a test"}
+    notification = notification_response.json()
     log_response("Notification Service", notification)
 
 
@@ -84,17 +78,17 @@ def async_call():
 
     def call_user_service():
         user_response = requests.get(f"{USERS_SERVICE_URL}/api/users")
-        user = {'message': "User1 : cl4404"}
+        user = user_response.json()
         log_response("Users Service", user)
 
     def call_content_service():
         content_response = requests.get(f"{CONTENT_SERVICE_URL}/api/content")
-        content = {"message": "aasl21049i323 : This is a test post"}
+        content = content_response.json()
         log_response("Content Service", content)
 
     def call_notification_service():
         notification_response = requests.get(f"{NOTIFICATION_SERVICE_URL}/api/notification")
-        notification = {'message': "notice2134 : Hello from a test"}
+        notification = notification_response.json()
         log_response("Notification Service", notification)
 
     # create thread and start
@@ -145,7 +139,6 @@ def middleware_endpoint():
     log_messages = []
     user_response = requests.get(f"{USERS_SERVICE_URL}/api/users")
     user = user_response.json()
-    user = {'message': "User1 : cl4404"}
     notification_response = requests.get(f"{NOTIFICATION_SERVICE_URL}/api/notification")
     notification = notification_response.json()
     notification = {'message': "notice2134 : Hello from a test"}
